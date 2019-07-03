@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:6.5.4
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    configs:
+      - source: logstash_config
+        target: /usr/share/logstash/config/logstash.yml
+      - source: logstash_pipeline
+        target: /usr/share/logstash/pipeline/logstash.conf
+    environment:
+      LS_JAVA_OPTS: "-Xmx1g -Xms512m"
+    networks:
+      - netlogstash
+    deploy:
+      mode: replicated
+      replicas: 1
+
+configs:
+
+  logstash_config:
+    file: ./logstash/config/logstash.yml
+  logstash_pipeline:
+    file: ./logstash/pipeline/logstash.conf
+
+networks:
+  netlogstash:
+    driver: overlay
